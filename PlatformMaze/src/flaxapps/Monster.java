@@ -5,7 +5,7 @@
 package flaxapps;
 
 import java.util.ArrayList;
-import java.util.Random;
+
 import javax.media.opengl.GL2;
 
 
@@ -32,13 +32,8 @@ public class Monster {
     float[] hls = {100.0f, 100.0f, 100.0f};
     
     public float[] calcBounds(ArrayList<Vertex> a, boolean speedy){
-        ArrayList<Vertex> o = new ArrayList<Vertex>();
+   
       
-        
-        float max_x = 0;
-        float min_x = 0;
-        float min_z = 0;
-        float max_z = 0;
         
         /*
         boolean first = true;
@@ -103,7 +98,7 @@ public class Monster {
       
       
      
-     boolean does = true;   
+     
      Vertex p = new Vertex(position.x*.25f,3.0f,position.z*.25f);
      boolean as = true;
      int cap = 0;
@@ -234,8 +229,7 @@ public class Monster {
                     if(main.hitsWall(new Vertex(position.x*.25f,3.0f,position.z*.25f), hls)){
                         position.x -= (float)Math.sin(rangle) * (speed);
                         position.z -= (float)Math.cos(rangle) * (speed);
-                        Random r = new Random();
-                        int radius = 20;
+                      
                         rangle = (float) ((float) (Math.toRadians(45) + (rangle)));// + Math.toRadians(r.nextInt(radius * 2) - radius));
                         hls = this.calcBounds(walkAnimation.drawStillFrame(position, gl, rangle),false);
                         

@@ -1,14 +1,14 @@
 package flaxapps;
 
-import static java.awt.event.KeyEvent.VK_F1; 
+import static java.awt.event.KeyEvent.VK_A;
 import static java.awt.event.KeyEvent.VK_B;
 import static java.awt.event.KeyEvent.VK_C;
 import static java.awt.event.KeyEvent.VK_D;
-import static java.awt.event.KeyEvent.VK_A;
 import static java.awt.event.KeyEvent.VK_DOWN;
 import static java.awt.event.KeyEvent.VK_E;
 import static java.awt.event.KeyEvent.VK_ESCAPE;
 import static java.awt.event.KeyEvent.VK_F;
+import static java.awt.event.KeyEvent.VK_F1;
 import static java.awt.event.KeyEvent.VK_LEFT;
 import static java.awt.event.KeyEvent.VK_RIGHT;
 import static java.awt.event.KeyEvent.VK_S;
@@ -29,7 +29,6 @@ import static javax.media.opengl.GL2ES1.GL_PERSPECTIVE_CORRECTION_HINT;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_AMBIENT;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_DIFFUSE;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_LIGHT1;
-import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_LIGHTING;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_POSITION;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_SMOOTH;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_SPECULAR;
@@ -37,11 +36,13 @@ import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_MODELVIEW;
 import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 
 import java.awt.AWTException;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.MouseInfo;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.color.ColorSpace;
@@ -57,6 +58,9 @@ import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.media.opengl.GL;
@@ -72,12 +76,6 @@ import javax.swing.JFrame;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
-import java.awt.Component;
-import java.awt.Rectangle;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * NeHe Lesson #10: Loading And Moving Through A 3D World
@@ -183,7 +181,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 
 		// Create the top-level container frame
 		// Swing's JFrame or AWT's Frame
-		//frame.setUndecorated(true);
+		frame.setUndecorated(true);
 		frame.getContentPane().add(canvas);
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
@@ -202,7 +200,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 		frame.setTitle(TITLE);
 		frame.pack();
 
-		//frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
 		frame.setVisible(true);
 		animator.start(); // start the animation loop
