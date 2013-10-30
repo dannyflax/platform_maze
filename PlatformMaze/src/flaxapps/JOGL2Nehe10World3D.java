@@ -1,6 +1,6 @@
 package flaxapps;
 
-import static java.awt.event.KeyEvent.VK_F1;
+import static java.awt.event.KeyEvent.VK_F1; 
 import static java.awt.event.KeyEvent.VK_B;
 import static java.awt.event.KeyEvent.VK_C;
 import static java.awt.event.KeyEvent.VK_D;
@@ -311,12 +311,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 		floor = new ModelControl();
 		top = new ModelControl();
 
-		try {
-			mc2.loadModelData("Ball1.obj");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 		try {
 			w2.loadModelData("walls2.obj");
 		} catch (IOException ex) {
