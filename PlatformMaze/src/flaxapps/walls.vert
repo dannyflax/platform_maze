@@ -27,9 +27,9 @@ void main()
 		//Dot product allows for multidimensional surfaces, while the distance function
 		//gives the light the fading effect, and gives it a nice round look at the corners
 		 
-		float distance = sqrt(pow(vp.x-ve.x,2)+pow(vp.y-ve.y,2)+pow(vp.z-ve.z,2));
-		NdotL = pow(distance/light_radius,10);
-        NdotL = 1/NdotL; 
+		float distance = sqrt(pow(vp.x-ve.x,2.0)+pow(vp.y-ve.y,2.0)+pow(vp.z-ve.z,2.0));
+		NdotL = pow(distance/light_radius,10.0);
+        NdotL = 1.0/NdotL;
        
         NdotL = clamp(0.0005*NdotL * clamp(dot(N, lightDir), 0.5,1.0),0.01,max_brightness);
 		

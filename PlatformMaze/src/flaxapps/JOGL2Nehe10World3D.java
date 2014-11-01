@@ -65,9 +65,11 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
+import javax.media.opengl.GL3;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLException;
+import javax.media.opengl.GLPipelineFactory;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.glu.GLU;
@@ -200,7 +202,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 		frame.setTitle(TITLE);
 		frame.pack();
 
-		frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		//frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
 		frame.setVisible(true);
 		animator.start(); // start the animation loop
@@ -230,18 +232,25 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 	@Override
 	public void init(GLAutoDrawable drawable) {
 
+		
 		pos.x = 0.0f;
 		pos.y = 0.0f;
 		pos.z = 0.0f;
 
+		
+		
 		GL2 gl = drawable.getGL().getGL2(); // get the OpenGL graphics context
+		
+		//drawable.setGL( GLPipelineFactory.create("javax.media.opengl.Debug", null, gl, null) );
+		
+		//drawable.setGL( GLPipelineFactory.create("javax.media.opengl.Trace", null, gl, new Object[] { System.err } ) );
 		glu = new GLU(); // get GL Utilities
 		gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // set background (clear) color
 		gl.glClearDepth(1.0f); // set clear depth value to farthest
 		gl.glEnable(GL_DEPTH_TEST); // enables depth testing
-		gl.glDepthFunc(GL_LEQUAL); // the type of depth test to do
+		//gl.glDepthFunc(GL_LEQUAL); // the type of depth test to do
 		gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // best
-																// perspective
+															// perspective
 																// correction
 		gl.glShadeModel(GL_SMOOTH); // blends colors nicely, and smoothes out
 									// lighting
@@ -258,7 +267,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-
+		
 		// Load the texture image
 		try {
 			// Use URL so that can read from JAR and disk file.
@@ -289,13 +298,14 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 			e.printStackTrace();
 		}
 
+		
 		// glimage img = new glimage("/images/mud.png");
 
 		// Blending control
 		gl.glColor4f(1.0f, 1.0f, 1.0f, 0.5f); // Brightness with alpha
 		// Blending function For translucency based On source alpha value
 		gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-
+		
 		AnimationHolder vase = new AnimationHolder(
 				"/flaxapps/personmodels/person", 20);
 
@@ -330,7 +340,9 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 		}
 		
 		this.setUp2DText(gl, "/images/wall.jpg");
-
+		
+		
+		/*
 		// Set up the lighting for Light-1
 		// Ambient light does not come from a particular direction. Need some
 		// ambient
@@ -344,11 +356,12 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 
 		float[] lightSpecularValue = { 1.0f, 1.0f, 1.0f, 1.0f };
 
+		
 		gl.glLightfv(GL_LIGHT1, GL_SPECULAR, lightSpecularValue, 0);
 		gl.glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbientValue, 0);
 		gl.glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuseValue, 0);
 		gl.glLightfv(GL_LIGHT1, GL_POSITION, lightDiffusePosition, 0);
-
+		 */
 		// gl.glEnable(GL_COLOR_MATERIAL);
 		// gl.glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 
@@ -388,8 +401,10 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 	@Override
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width,
 			int height) {
+		
+		
 		GL2 gl = drawable.getGL().getGL2(); // get the OpenGL 2 graphics context
-
+		
 		if (height == 0)
 			height = 1; // prevent divide by zero
 		float aspect = (float) width / height;
@@ -406,6 +421,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 		// Enable the model-view transform
 		gl.glMatrixMode(GL_MODELVIEW);
 		gl.glLoadIdentity(); // reset
+		
 	}
 
 	/**
@@ -481,6 +497,8 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 	@Override
 	public void display(GLAutoDrawable drawable) {
 
+		
+		
 		float[] hls = { 2.0f, 2.0f, 2.0f };
 
 		if (up) {
@@ -575,7 +593,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 																// buffers
 		gl.glLoadIdentity(); // reset the model-view matrix
 
-		gl.glEnable(GL_SMOOTH);
+		//gl.glEnable(GL_SMOOTH);
 
 		// Blending control
 		gl.glEnable(GL.GL_BLEND);
@@ -621,14 +639,14 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 		// mydude.act(gl,this);
 		
 		
-		/*
-		int fl = gl.glGetUniformLocation(shader2,"furLength");
-		for(int i = 1; i<=20; i++){
-			gl.glUniform1f(fl, (float) (i*.10));
-			mc2.drawModel(new flaxapps.Vertex(0, 0, -5), gl, 0);
-		}
 		
-		*/
+		//int fl = gl.glGetUniformLocation(shader2,"furLength");
+		//for(int i = 1; i<=20; i++){
+			//gl.glUniform1f(fl, (float) (i*.10));
+			//mc2.drawModel(new flaxapps.Vertex(0, 0, -5), gl, 0);
+		//}
+		
+		
 		
 		
 		
@@ -755,7 +773,9 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 
 		im mud = this.makeImg(txt);
 
+		
 		gl.glBindTexture(GL.GL_TEXTURE_2D, 11);
+		
 		gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, 1);
 		gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, GL.GL_RGBA, mud.wi, mud.he, 0,
 				GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, mud.b);
@@ -763,15 +783,19 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 		// Use nearer filter if image is larger than the original texture
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER,
 				GL.GL_NEAREST);
+		
 		// Use nearer filter if image is smaller than the original texture
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER,
 				GL.GL_NEAREST);
-
+		
 		// For texture coordinates more than 1, set to wrap mode to GL_REPEAT
 		// for
 		// both S and T axes (default setting is GL_CLAMP)
-		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_LINEAR);
-		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_LINEAR);
+		
+		//gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_LINEAR);
+		
+		//gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_LINEAR);
+		
 		return 11;
 	}
 

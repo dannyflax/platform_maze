@@ -17,9 +17,9 @@ void main()
  
 
     NdotL = dot(N,lightDir);
-    vec4 ps = gl_Vertex * 10;
+    vec4 ps = gl_Vertex * 10.0;
         
 	vec3 p = ps.xyz + (gl_Normal * furLength);
 	
-	gl_Position = gl_ModelViewProjectionMatrix * vec4(p,1);
+	gl_Position = gl_ModelViewProjectionMatrix * vec4(p,1.0);
 }
