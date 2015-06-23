@@ -21,17 +21,11 @@ import static java.awt.event.KeyEvent.VK_Z;
 import static javax.media.opengl.GL.GL_COLOR_BUFFER_BIT;
 import static javax.media.opengl.GL.GL_DEPTH_BUFFER_BIT;
 import static javax.media.opengl.GL.GL_DEPTH_TEST;
-import static javax.media.opengl.GL.GL_LEQUAL;
 import static javax.media.opengl.GL.GL_NICEST;
 import static javax.media.opengl.GL.GL_ONE;
 import static javax.media.opengl.GL.GL_SRC_ALPHA;
 import static javax.media.opengl.GL2ES1.GL_PERSPECTIVE_CORRECTION_HINT;
-import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_AMBIENT;
-import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_DIFFUSE;
-import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_LIGHT1;
-import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_POSITION;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_SMOOTH;
-import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_SPECULAR;
 import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_MODELVIEW;
 import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 
@@ -56,6 +50,9 @@ import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -65,19 +62,19 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
-import javax.media.opengl.GL3;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
-import javax.media.opengl.GLException;
-import javax.media.opengl.GLPipelineFactory;
-import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.glu.GLU;
 import javax.swing.JFrame;
 
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.texture.Texture;
-import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
+
+import flaxapps.jogl_util.AnimationHolder;
+import flaxapps.jogl_util.ModelControl;
+import flaxapps.jogl_util.Shader_Manager;
+import flaxapps.jogl_util.Vertex;
 
 /**
  * NeHe Lesson #10: Loading And Moving Through A 3D World
@@ -103,7 +100,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 	ModelControl floor;
 	ModelControl top;
 
-	ArrayList<flaxapps.Vertex> collisionVerts = new ArrayList<flaxapps.Vertex>();
+	ArrayList<Vertex> collisionVerts = new ArrayList<Vertex>();
 
 	Monster mydude;
 	public boolean controlled = true;
@@ -120,7 +117,6 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 	// The world
 	Point c_mpos;
 	Point p_mpos;
-	Sector sector;
 	int cmap_id;
 
 	public float lookUpMax = (float) -45.0;
@@ -143,7 +139,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 	public float headingY = 0; // heading of player, about y-axis
 	public float lookUpAngle = 0.0f;
 
-	private flaxapps.Vertex pos = new flaxapps.Vertex(0, 0, 0);
+	private Vertex pos = new Vertex(0, 0, 0);
 	private float moveIncrement = 1.0f;
 	// private float turnIncrement = 1.5f; // each turn in degree
 	private float lookUpIncrement = 1.0f;
@@ -153,7 +149,6 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 
 	private Texture[] textures = new Texture[3];
 	private int currTextureFilter = 0; // Which Filter To Use
-	private String textureFilename = "/images/wall.jpg";
 	static GLCanvas canvas;
 
 	// Texture image flips vertically. Shall use TextureCoords class to retrieve
@@ -202,7 +197,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 		frame.setTitle(TITLE);
 		frame.pack();
 
-		//frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		// frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
 		frame.setVisible(true);
 		animator.start(); // start the animation loop
@@ -232,84 +227,50 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 	@Override
 	public void init(GLAutoDrawable drawable) {
 
-		
 		pos.x = 0.0f;
 		pos.y = 0.0f;
 		pos.z = 0.0f;
 
-		
-		
 		GL2 gl = drawable.getGL().getGL2(); // get the OpenGL graphics context
-		
-		//drawable.setGL( GLPipelineFactory.create("javax.media.opengl.Debug", null, gl, null) );
-		
-		//drawable.setGL( GLPipelineFactory.create("javax.media.opengl.Trace", null, gl, new Object[] { System.err } ) );
+
+		// drawable.setGL( GLPipelineFactory.create("javax.media.opengl.Debug",
+		// null, gl, null) );
+
+		// drawable.setGL( GLPipelineFactory.create("javax.media.opengl.Trace",
+		// null, gl, new Object[] { System.err } ) );
 		glu = new GLU(); // get GL Utilities
 		gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // set background (clear) color
 		gl.glClearDepth(1.0f); // set clear depth value to farthest
 		gl.glEnable(GL_DEPTH_TEST); // enables depth testing
-		//gl.glDepthFunc(GL_LEQUAL); // the type of depth test to do
+		// gl.glDepthFunc(GL_LEQUAL); // the type of depth test to do
 		gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // best
-															// perspective
+																// perspective
 																// correction
 		gl.glShadeModel(GL_SMOOTH); // blends colors nicely, and smoothes out
 									// lighting
 
 		// Read the world
 		try {
-			shader1 = sm.init("walls", gl);
+			shader1 = sm.init("resources/walls", gl);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
 
 		try {
-			shader2 = sm.init("spider", gl);
+			shader2 = sm.init("resources/spider", gl);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		
-//		// Load the texture image
-//		try {
-//			// Use URL so that can read from JAR and disk file.
-//			BufferedImage image = ImageIO.read(this.getClass().getResource(
-//					textureFilename));
-//
-//			// Create a OpenGL Texture object
-//			textures[0] = AWTTextureIO.newTexture(GLProfile.getDefault(),
-//					image, false);
-//			// Nearest filter is least compute-intensive
-//			// Use nearer filter if image is larger than the original texture
-//			gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER,
-//					GL.GL_NEAREST);
-//			// Use nearer filter if image is smaller than the original texture
-//			gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER,GL.GL_NEAREST);
-//
-//			// For texture coordinates more than 1, set to wrap mode to
-//			// GL_REPEAT for
-//			// both S and T axes (default setting is GL_CLAMP)
-//			gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S,
-//					GL.GL_REPEAT);
-//			gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T,
-//					GL.GL_REPEAT);
-//
-//		} catch (GLException e) {
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-
-		
-		// glimage img = new glimage("/images/mud.png");
 
 		// Blending control
 		gl.glColor4f(1.0f, 1.0f, 1.0f, 0.5f); // Brightness with alpha
 		// Blending function For translucency based On source alpha value
 		gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-		
-		AnimationHolder vase = new AnimationHolder(
-				"/flaxapps/personmodels/person", 20);
 
-		mydude = new Monster(vase, new flaxapps.Vertex(0.0f, 0.0f, -200.0f));
+		AnimationHolder vase = new AnimationHolder(
+				"resources/personmodels/person", 1,20,1);
+
+		mydude = new Monster(vase, new Vertex(0.0f, 0.0f, -200.0f));
 		mydude.stop();
 		mydude.rangle = 0;
 		mydude.speed = 3.0f;
@@ -319,58 +280,26 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 		floor = new ModelControl();
 		top = new ModelControl();
 
-		
 		try {
-			w2.loadModelData("walls2.obj");
+			w2.loadModelData("resources/walls2.obj");
 		} catch (IOException ex) {
 			Logger.getLogger(JOGL2Nehe10World3D.class.getName()).log(
 					Level.SEVERE, null, ex);
 		}
 		try {
-			floor.loadModelData("floor.obj");
+			floor.loadModelData("resources/floor.obj");
 		} catch (IOException ex) {
 			Logger.getLogger(JOGL2Nehe10World3D.class.getName()).log(
 					Level.SEVERE, null, ex);
 		}
 		try {
-			top.loadModelData("top.obj");
+			top.loadModelData("resources/top.obj");
 		} catch (IOException ex) {
 			Logger.getLogger(JOGL2Nehe10World3D.class.getName()).log(
 					Level.SEVERE, null, ex);
 		}
-		
-		this.setUp2DText(gl, "/images/wall.jpg");
-		
-		
-		/*
-		// Set up the lighting for Light-1
-		// Ambient light does not come from a particular direction. Need some
-		// ambient
-		// light to light up the scene. Ambient's value in RGBA
-		float[] lightAmbientValue = { 1.0f, 0.0f, 0.0f, 1.0f };
-		// Diffuse light comes from a particular location. Diffuse's value in
-		// RGBA
-		float[] lightDiffuseValue = { 1.0f, 0.0f, 0.0f, 1.0f };
-		// Diffuse light location xyz (in front of the screen).
-		float lightDiffusePosition[] = { 1.0f, 1.0f, 0.0f, 1.0f };
 
-		float[] lightSpecularValue = { 1.0f, 1.0f, 1.0f, 1.0f };
-
-		
-		gl.glLightfv(GL_LIGHT1, GL_SPECULAR, lightSpecularValue, 0);
-		gl.glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbientValue, 0);
-		gl.glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuseValue, 0);
-		gl.glLightfv(GL_LIGHT1, GL_POSITION, lightDiffusePosition, 0);
-		 */
-		// gl.glEnable(GL_COLOR_MATERIAL);
-		// gl.glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-
-		// gl.glMaterialfv(GL_FRONT, GL_SPECULAR, specReflection);
-		// gl.glMateriali(GL_FRONT, GL_SHININESS, 56);
-
-		// gl.glEnable(GL_LIGHT1); // Enable Light-1
-		// gl.glEnable(GL_LIGHTING); // But disable lighting
-		// isLightOn = false;
+		this.setUp2DText(gl, "resources/images/wall.jpg");
 
 		Robot r = null;
 		try {
@@ -401,10 +330,9 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 	@Override
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width,
 			int height) {
-		
-		
+
 		GL2 gl = drawable.getGL().getGL2(); // get the OpenGL 2 graphics context
-		
+
 		if (height == 0)
 			height = 1; // prevent divide by zero
 		float aspect = (float) width / height;
@@ -421,7 +349,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 		// Enable the model-view transform
 		gl.glMatrixMode(GL_MODELVIEW);
 		gl.glLoadIdentity(); // reset
-		
+
 	}
 
 	/**
@@ -429,10 +357,10 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 	 */
 
 	class AABB {
-		flaxapps.Vertex c; // center point
+		Vertex c; // center point
 		float[] r; // halfwidths
 
-		public AABB(float[] ar, flaxapps.Vertex ac) {
+		public AABB(float[] ar, Vertex ac) {
 			c = ac;
 			r = ar;
 		}
@@ -449,17 +377,16 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 		return true;
 	}
 
-	public void draw2doorRoom(flaxapps.Vertex l, double a, GL2 gl) {
+	public void draw2doorRoom(Vertex l, double a, GL2 gl) {
 		gl.glColor3d(1.0, 0.0, 0.0);
 		collisionVerts.addAll(floor.drawModel(l, gl, 0));
 		gl.glColor3d(0.0, 1.0, 0.0);
-		
+
 		collisionVerts.addAll(w2.drawModel(l, gl, (float) a));
 		w2.restore();
 		gl.glColor3d(0.0, 0.0, 1.0);
 		top.drawModel(l, gl, 0);
-		
-		
+
 	}
 
 	public void captureScreen(String fileName) throws Exception {
@@ -479,7 +406,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 		 */
 	}
 
-	public boolean hitsWall(flaxapps.Vertex pos, float[] hls) {
+	public boolean hitsWall(Vertex pos, float[] hls) {
 
 		float[] whls = { 0.0f, 0.0f, 0.0f };
 		AABB person = new AABB(hls, pos);
@@ -497,15 +424,13 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 	@Override
 	public void display(GLAutoDrawable drawable) {
 
-		
-		
 		float[] hls = { 2.0f, 2.0f, 2.0f };
 
 		if (up) {
 			posX -= (float) Math.sin(Math.toRadians(headingY)) * moveIncrement;
 			posZ -= (float) Math.cos(Math.toRadians(headingY)) * moveIncrement;
 
-			if (this.hitsWall(new flaxapps.Vertex(posX, posY + 10.0f, posZ),
+			if (this.hitsWall(new Vertex(posX, posY + 10.0f, posZ),
 					hls)) {
 				posX += (float) Math.sin(Math.toRadians(headingY))
 						* moveIncrement;
@@ -519,7 +444,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 			posX += (float) Math.sin(Math.toRadians(headingY)) * moveIncrement;
 			posZ += (float) Math.cos(Math.toRadians(headingY)) * moveIncrement;
 
-			if (this.hitsWall(new flaxapps.Vertex(posX, posY + 10.0f, posZ),
+			if (this.hitsWall(new Vertex(posX, posY + 10.0f, posZ),
 					hls)) {
 				posX -= (float) Math.sin(Math.toRadians(headingY))
 						* moveIncrement;
@@ -533,7 +458,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 					* moveIncrement;
 			posZ -= (float) Math.cos(Math.toRadians(headingY + 90.0))
 					* moveIncrement;
-			if (this.hitsWall(new flaxapps.Vertex(posX, posY + 10.0f, posZ),
+			if (this.hitsWall(new Vertex(posX, posY + 10.0f, posZ),
 					hls)) {
 				posX += (float) Math.sin(Math.toRadians(headingY + 90.0))
 						* moveIncrement;
@@ -548,7 +473,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 			posZ -= (float) Math.cos(Math.toRadians(headingY - 90.0))
 					* moveIncrement;
 
-			if (this.hitsWall(new flaxapps.Vertex(posX, posY + 10.0f, posZ),
+			if (this.hitsWall(new Vertex(posX, posY + 10.0f, posZ),
 					hls)) {
 				posX += (float) Math.sin(Math.toRadians(headingY - 90.0))
 						* moveIncrement;
@@ -564,7 +489,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 			// System.out.println(xdif);
 			// System.out.println(frame.getLocation().x);
 			lookUpAngle += (ydif / 5.0);
-			
+
 			if ((lookUpAngle <= lookUpMax || lookUpAngle >= lookUpMin)) {
 				lookUpAngle -= (ydif / 5.0);
 			}
@@ -593,12 +518,11 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 																// buffers
 		gl.glLoadIdentity(); // reset the model-view matrix
 
-		//gl.glEnable(GL_SMOOTH);
+		// gl.glEnable(GL_SMOOTH);
 
 		// Blending control
 		gl.glEnable(GL.GL_BLEND);
-		
-		
+
 		// Rotate up and down to look up and down
 		gl.glRotatef(lookUpAngle, 1.0f, 0, 0);
 
@@ -613,13 +537,13 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 		// float[] po = {posX,-(posY + (-walkBias - 0.25f)),posZ};
 		gl.glEnable(GL.GL_TEXTURE_2D);
 		gl.glBindTexture(GL.GL_TEXTURE_2D, 11);
-		
+
 		gl.glTranslatef(-posX, -posY, -posZ);
 
 		gl.glUseProgram(0);
 		int txt1 = gl.glGetUniformLocation(shader2, "textureMap");
 		gl.glUniform1f(txt1, 11);
-		
+
 		float x = (float) Math.sin(Math.toRadians(headingY));
 		float z = (float) Math.cos(Math.toRadians(headingY));
 		float y = (float) Math.sin(Math.toRadians(lookUpAngle));
@@ -629,27 +553,18 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 		gl.glUniform4f(vps, posX, posY, posZ, 1.0f);
 		int clor = gl.glGetUniformLocation(shader2, "dude_color");
 
-		
-		
-		
 		gl.glUniform4f(clor, 0.0f, 0.0f, 1.0f, 1.0f);
-		
+
 		// System.out.println( Math.toDegrees(a) );
 		// System.out.println("R" + Math.toRadians(90));
 		// mydude.act(gl,this);
-		
-		
-		
-		//int fl = gl.glGetUniformLocation(shader2,"furLength");
-		//for(int i = 1; i<=20; i++){
-			//gl.glUniform1f(fl, (float) (i*.10));
-			//mc2.drawModel(new flaxapps.Vertex(0, 0, -5), gl, 0);
-		//}
-		
-		
-		
-		
-		
+
+		// int fl = gl.glGetUniformLocation(shader2,"furLength");
+		// for(int i = 1; i<=20; i++){
+		// gl.glUniform1f(fl, (float) (i*.10));
+		// mc2.drawModel(new Vertex(0, 0, -5), gl, 0);
+		// }
+
 		gl.glUseProgram(shader1);
 
 		int txt = gl.glGetUniformLocation(shader1, "mytext");
@@ -661,23 +576,21 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 		gl.glUniform4f(vps, posX, posY, posZ, 1.0f);
 
 		gl.glDisable(GL.GL_BLEND);
-		
-		collisionVerts = new ArrayList<flaxapps.Vertex>();
 
-		
-		  for(int num = 0; num<2; num+=2){
-			this.draw2doorRoom(new
-			  flaxapps.Vertex(51.0f * num ,0.0f,0.0f), 0, gl);
-			  this.draw2doorRoom(new flaxapps.Vertex(51.0f * num,0.0f,-51.0f),
-			  -Math.PI, gl);
-			  
-			  this.draw2doorRoom(new flaxapps.Vertex((51.0f * (num + 1))
-			  ,0.0f,-51.0f), Math.PI/2, gl); 
-			  this.draw2doorRoom(new
-			  flaxapps.Vertex((51.0f * (num + 1)),0.0f,0.0f), -Math.PI/2, gl);
-		  
-		  }
-		 
+		collisionVerts = new ArrayList<Vertex>();
+
+		for (int num = 0; num < 2; num += 2) {
+			this.draw2doorRoom(new Vertex(51.0f * num, 0.0f, 0.0f), 0,
+					gl);
+			this.draw2doorRoom(new Vertex(51.0f * num, 0.0f, -51.0f),
+					-Math.PI, gl);
+
+			this.draw2doorRoom(new Vertex((51.0f * (num + 1)), 0.0f,
+					-51.0f), Math.PI / 2, gl);
+			this.draw2doorRoom(new Vertex((51.0f * (num + 1)), 0.0f,
+					0.0f), -Math.PI / 2, gl);
+
+		}
 
 		gl.glFlush();
 
@@ -731,15 +644,16 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 		int w = 0;
 		int h = 0;
 		try {
-			bufferedImage = ImageIO.read(JOGL2Nehe10World3D.class
-					.getResource(txt));
+			FileInputStream fStream = new FileInputStream(new File(txt));
+			bufferedImage = ImageIO.read(fStream);
 			w = bufferedImage.getWidth();
 			h = bufferedImage.getHeight();
+		} catch (FileNotFoundException  e2) {
+			e2.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		
+
 		WritableRaster raster = Raster.createInterleavedRaster(
 				DataBuffer.TYPE_BYTE, w, h, 4, null);
 		ComponentColorModel colorModel = new ComponentColorModel(
@@ -773,9 +687,8 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 
 		im mud = this.makeImg(txt);
 
-		
 		gl.glBindTexture(GL.GL_TEXTURE_2D, 11);
-		
+
 		gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, 1);
 		gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, GL.GL_RGBA, mud.wi, mud.he, 0,
 				GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, mud.b);
@@ -783,25 +696,27 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 		// Use nearer filter if image is larger than the original texture
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER,
 				GL.GL_NEAREST);
-		
+
 		// Use nearer filter if image is smaller than the original texture
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER,
 				GL.GL_NEAREST);
-		
+
 		// For texture coordinates more than 1, set to wrap mode to GL_REPEAT
 		// for
 		// both S and T axes (default setting is GL_CLAMP)
-		
-		//gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_LINEAR);
-		
-		//gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_LINEAR);
-		
+
+		// gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S,
+		// GL.GL_LINEAR);
+
+		// gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T,
+		// GL.GL_LINEAR);
+
 		return 11;
 	}
 
 	public int setUpText(GL2 gl, String txt) {
 		im b = this.makeImg(txt);
-		im mud = this.makeImg("/images/mars2.jpg");
+		im mud = this.makeImg("resources/images/mars2.jpg");
 		ByteBuffer bb = b.b;
 		int w = b.wi;
 		int h = b.he;
@@ -931,9 +846,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 		case VK_ESCAPE:
 			frame.dispose();
 			System.exit(0);
-			
 
-			
 			break;
 		case VK_LEFT: // player turns left (scene rotates right)
 			// headingY += turnIncrement;
@@ -1103,37 +1016,4 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 
 	}
 
-	// A sector comprises many triangles (inner class)
-	class Sector {
-		Triangle[] triangles;
-
-		// Constructor
-		public Sector(int numTriangles) {
-			triangles = new Triangle[numTriangles];
-			for (int i = 0; i < numTriangles; i++) {
-				triangles[i] = new Triangle();
-			}
-		}
-	}
-
-	// A triangle has 3 vertices (inner class)
-	class Triangle {
-		Vertex[] vertices = new Vertex[3];
-
-		public Triangle() {
-			vertices[0] = new Vertex();
-			vertices[1] = new Vertex();
-			vertices[2] = new Vertex();
-		}
-	}
-
-	// A vertex has xyz (location) and uv (for texture) (inner class)
-	class Vertex {
-		float x, y, z; // 3D x,y,z location
-		float u, v; // 2D texture coordinates
-
-		public String toString() {
-			return "(" + x + "," + y + "," + z + ")" + "(" + u + "," + v + ")";
-		}
-	}
 }

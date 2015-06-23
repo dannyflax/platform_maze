@@ -11,5 +11,6 @@
 	<classpathentry kind="lib" path="/JOGL/jogamp-all-platforms/jar/jogl-all-natives-windows-i586.jar"/>
 	<classpathentry kind="lib" path="/JOGL/jogamp-all-platforms/jar/jogl-all.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/JOGL_Utils/jar/JOGL_Utils.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

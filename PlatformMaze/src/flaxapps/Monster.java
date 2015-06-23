@@ -8,6 +8,9 @@ import java.util.ArrayList;
 
 import javax.media.opengl.GL2;
 
+import flaxapps.jogl_util.AnimationHolder;
+import flaxapps.jogl_util.Vertex;
+
 
 
 
