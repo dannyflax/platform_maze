@@ -268,35 +268,35 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 			e1.printStackTrace();
 		}
 		
-		// Load the texture image
-		try {
-			// Use URL so that can read from JAR and disk file.
-			BufferedImage image = ImageIO.read(this.getClass().getResource(
-					textureFilename));
-
-			// Create a OpenGL Texture object
-			textures[0] = AWTTextureIO.newTexture(GLProfile.getDefault(),
-					image, false);
-			// Nearest filter is least compute-intensive
-			// Use nearer filter if image is larger than the original texture
-			gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER,
-					GL.GL_NEAREST);
-			// Use nearer filter if image is smaller than the original texture
-			gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER,GL.GL_NEAREST);
-
-			// For texture coordinates more than 1, set to wrap mode to
-			// GL_REPEAT for
-			// both S and T axes (default setting is GL_CLAMP)
-			gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S,
-					GL.GL_REPEAT);
-			gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T,
-					GL.GL_REPEAT);
-
-		} catch (GLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		// Load the texture image
+//		try {
+//			// Use URL so that can read from JAR and disk file.
+//			BufferedImage image = ImageIO.read(this.getClass().getResource(
+//					textureFilename));
+//
+//			// Create a OpenGL Texture object
+//			textures[0] = AWTTextureIO.newTexture(GLProfile.getDefault(),
+//					image, false);
+//			// Nearest filter is least compute-intensive
+//			// Use nearer filter if image is larger than the original texture
+//			gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER,
+//					GL.GL_NEAREST);
+//			// Use nearer filter if image is smaller than the original texture
+//			gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER,GL.GL_NEAREST);
+//
+//			// For texture coordinates more than 1, set to wrap mode to
+//			// GL_REPEAT for
+//			// both S and T axes (default setting is GL_CLAMP)
+//			gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S,
+//					GL.GL_REPEAT);
+//			gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T,
+//					GL.GL_REPEAT);
+//
+//		} catch (GLException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 
 		
 		// glimage img = new glimage("/images/mud.png");
