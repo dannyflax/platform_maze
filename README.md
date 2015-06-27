@@ -1,5 +1,5 @@
 ##About this project
-This project uses the JOGL library ([their website](https://www.jogamp.org)) and [JOGL Utils](https://github.com/dannyflax/JOGL-Utilities). It was designed as a basis for 3D games in the future. 
+This project uses [JOGL](https://www.jogamp.org)) and [JOGL Utils](https://github.com/dannyflax/JOGL-Utilities). It was designed as a basis for 3D games in the future. 
 
 The user may walk around the environment using WASD and rotate the camera using the mouse.
 
