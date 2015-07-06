@@ -1,18 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-package flaxapps;
+package flaxapps.maze;
 
 import java.util.ArrayList;
 
-import javax.media.opengl.GL2;
-
-import flaxapps.jogl_util.AnimationHolder;
-import flaxapps.jogl_util.Vertex;
-
-
-
+import com.flaxapps.joglutil.AnimationHolder;
+import com.flaxapps.joglutil.Vertex;
+import com.jogamp.opengl.GL2;
 
 /**
  *
@@ -97,7 +89,7 @@ public class Monster {
         isMoving = true;
     }
     
-    public boolean spotsPerson(JOGL2Nehe10World3D main){
+    public boolean spotsPerson(PlatformMaze main){
       
       
      
@@ -151,7 +143,7 @@ public class Monster {
         return (float)Math.sqrt(Math.pow(mp.x - ap.x,2) + Math.pow(mp.y - ap.y,2) + Math.pow(mp.z - ap.z,2));
     }
     
-    public void act(GL2 gl, JOGL2Nehe10World3D main){
+    public void act(GL2 gl, PlatformMaze main){
         if(isMoving){
             System.out.println("ACT");
            float d = distance(new Vertex(main.posX,3.0f,main.posZ),new Vertex(0.25f*position.x,3.0f,.25f*position.z));
@@ -258,7 +250,7 @@ public class Monster {
     
     
     
-    public boolean searchAndSeize(float interval, float max, JOGL2Nehe10World3D main){
+    public boolean searchAndSeize(float interval, float max, PlatformMaze main){
         
         oangle = rangle;
         for(int i = 0; i<=(max/interval); i++){

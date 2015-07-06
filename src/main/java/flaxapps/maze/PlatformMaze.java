@@ -1,4 +1,4 @@
-package flaxapps;
+package flaxapps.maze;
 
 import static java.awt.event.KeyEvent.VK_A;
 import static java.awt.event.KeyEvent.VK_B;
@@ -18,16 +18,6 @@ import static java.awt.event.KeyEvent.VK_V;
 import static java.awt.event.KeyEvent.VK_W;
 import static java.awt.event.KeyEvent.VK_X;
 import static java.awt.event.KeyEvent.VK_Z;
-import static javax.media.opengl.GL.GL_COLOR_BUFFER_BIT;
-import static javax.media.opengl.GL.GL_DEPTH_BUFFER_BIT;
-import static javax.media.opengl.GL.GL_DEPTH_TEST;
-import static javax.media.opengl.GL.GL_NICEST;
-import static javax.media.opengl.GL.GL_ONE;
-import static javax.media.opengl.GL.GL_SRC_ALPHA;
-import static javax.media.opengl.GL2ES1.GL_PERSPECTIVE_CORRECTION_HINT;
-import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_SMOOTH;
-import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_MODELVIEW;
-import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 
 import java.awt.AWTException;
 import java.awt.Component;
@@ -60,21 +50,20 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
-import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLEventListener;
-import javax.media.opengl.awt.GLCanvas;
-import javax.media.opengl.glu.GLU;
 import javax.swing.JFrame;
 
+import com.flaxapps.joglutil.AnimationHolder;
+import com.flaxapps.joglutil.ModelControl;
+import com.flaxapps.joglutil.Shader_Manager;
+import com.flaxapps.joglutil.Vertex;
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.awt.GLCanvas;
+import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.texture.Texture;
-
-import flaxapps.jogl_util.AnimationHolder;
-import flaxapps.jogl_util.ModelControl;
-import flaxapps.jogl_util.Shader_Manager;
-import flaxapps.jogl_util.Vertex;
 
 /**
  * NeHe Lesson #10: Loading And Moving Through A 3D World
@@ -86,7 +75,7 @@ import flaxapps.jogl_util.Vertex;
  * right/left)
  */
 
-public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
+public class PlatformMaze implements GLEventListener, KeyListener {
 
 	private static String TITLE = "NeHe Lesson #10: Loading And Moving Through A 3D World";
 	private static final int CANVAS_WIDTH = 640; // width of the drawable
@@ -164,7 +153,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 		canvas = new GLCanvas(); // heavy-weight GLCanvas
 
 		canvas.setPreferredSize(new Dimension(CANVAS_WIDTH, CANVAS_HEIGHT));
-		JOGL2Nehe10World3D renderer = new JOGL2Nehe10World3D();
+		PlatformMaze renderer = new PlatformMaze();
 		canvas.addGLEventListener(renderer);
 
 		// For Handling KeyEvents
@@ -241,23 +230,23 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 		glu = new GLU(); // get GL Utilities
 		gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // set background (clear) color
 		gl.glClearDepth(1.0f); // set clear depth value to farthest
-		gl.glEnable(GL_DEPTH_TEST); // enables depth testing
+		gl.glEnable(GL2.GL_DEPTH_TEST); // enables depth testing
 		// gl.glDepthFunc(GL_LEQUAL); // the type of depth test to do
-		gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // best
+		gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST); // best
 																// perspective
 																// correction
-		gl.glShadeModel(GL_SMOOTH); // blends colors nicely, and smoothes out
+		gl.glShadeModel(GL2.GL_SMOOTH); // blends colors nicely, and smoothes out
 									// lighting
 
 		// Read the world
 		try {
-			shader1 = sm.init("resources/walls", gl);
+			shader1 = sm.init("src/main/resources/walls", gl);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
 
 		try {
-			shader2 = sm.init("resources/spider", gl);
+			shader2 = sm.init("src/main/resources/spider", gl);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -265,10 +254,10 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 		// Blending control
 		gl.glColor4f(1.0f, 1.0f, 1.0f, 0.5f); // Brightness with alpha
 		// Blending function For translucency based On source alpha value
-		gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE);
 
 		AnimationHolder vase = new AnimationHolder(
-				"resources/personmodels/person", 1,20,1);
+				"src/main/resources/personmodels/person", 1,20,1);
 
 		mydude = new Monster(vase, new Vertex(0.0f, 0.0f, -200.0f));
 		mydude.stop();
@@ -281,31 +270,30 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 		top = new ModelControl();
 
 		try {
-			w2.loadModelData("resources/walls2.obj");
+			w2.loadModelData("src/main/resources/walls2.obj");
 		} catch (IOException ex) {
-			Logger.getLogger(JOGL2Nehe10World3D.class.getName()).log(
+			Logger.getLogger(PlatformMaze.class.getName()).log(
 					Level.SEVERE, null, ex);
 		}
 		try {
-			floor.loadModelData("resources/floor.obj");
+			floor.loadModelData("src/main/resources/floor.obj");
 		} catch (IOException ex) {
-			Logger.getLogger(JOGL2Nehe10World3D.class.getName()).log(
+			Logger.getLogger(PlatformMaze.class.getName()).log(
 					Level.SEVERE, null, ex);
 		}
 		try {
-			top.loadModelData("resources/top.obj");
+			top.loadModelData("src/main/resources/top.obj");
 		} catch (IOException ex) {
-			Logger.getLogger(JOGL2Nehe10World3D.class.getName()).log(
+			Logger.getLogger(PlatformMaze.class.getName()).log(
 					Level.SEVERE, null, ex);
 		}
 
-		this.setUp2DText(gl, "resources/images/wall.jpg");
+		this.setUp2DText(gl, "src/main/resources/images/wall.jpg");
 
 		Robot r = null;
 		try {
 			r = new Robot();
 		} catch (AWTException e2) {
-			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
 		if (r != null) {
@@ -341,13 +329,13 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 		gl.glViewport(0, 0, width, height);
 
 		// Setup perspective projection, with aspect ratio matches viewport
-		gl.glMatrixMode(GL_PROJECTION); // choose projection matrix
+		gl.glMatrixMode(GL2.GL_PROJECTION); // choose projection matrix
 		gl.glLoadIdentity(); // reset projection matrix
 		glu.gluPerspective(45.0, aspect, 0.1, 100.0); // fovy, aspect, zNear,
 														// zFar
 
 		// Enable the model-view transform
-		gl.glMatrixMode(GL_MODELVIEW);
+		gl.glMatrixMode(GL2.GL_MODELVIEW);
 		gl.glLoadIdentity(); // reset
 
 	}
@@ -500,7 +488,6 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 			try {
 				r = new Robot();
 			} catch (AWTException e2) {
-				// TODO Auto-generated catch block
 				e2.printStackTrace();
 			}
 			if (r != null) {
@@ -513,7 +500,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 
 		t = (t + 1);
 		GL2 gl = drawable.getGL().getGL2(); // get the OpenGL 2 graphics context
-		gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear color
+		gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT); // clear color
 																// and depth
 																// buffers
 		gl.glLoadIdentity(); // reset the model-view matrix
@@ -716,7 +703,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 
 	public int setUpText(GL2 gl, String txt) {
 		im b = this.makeImg(txt);
-		im mud = this.makeImg("resources/images/mars2.jpg");
+		im mud = this.makeImg("src/main/resources/images/mars2.jpg");
 		ByteBuffer bb = b.b;
 		int w = b.wi;
 		int h = b.he;
@@ -817,7 +804,6 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 				try {
 					r = new Robot();
 				} catch (AWTException e2) {
-					// TODO Auto-generated catch block
 					e2.printStackTrace();
 				}
 				if (r != null) {
@@ -888,7 +874,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 			try {
 				this.captureScreen("AMAZING.png");
 			} catch (Exception ex) {
-				Logger.getLogger(JOGL2Nehe10World3D.class.getName()).log(
+				Logger.getLogger(PlatformMaze.class.getName()).log(
 						Level.SEVERE, null, ex);
 			}
 			break;
@@ -987,7 +973,7 @@ public class JOGL2Nehe10World3D implements GLEventListener, KeyListener {
 			int w = 0;
 			int h = 0;
 			try {
-				bufferedImage = ImageIO.read(JOGL2Nehe10World3D.class
+				bufferedImage = ImageIO.read(PlatformMaze.class
 						.getResource(src));
 				w = bufferedImage.getWidth();
 				h = bufferedImage.getHeight();
