@@ -92,3 +92,10 @@ build/resources/main/personmodels/person_000017.obj
 build/resources/main/personmodels/person_000018.obj
 build/resources/main/personmodels/person_000019.obj
 build/resources/main/personmodels/person_000020.obj
+build/distributions/platform_maze_github.tar
+build/distributions/platform_maze_github.zip
+build/libs/platform_maze_github.jar
+build/scripts/platform_maze_github
+build/scripts/platform_maze_github.bat
+build/tmp/jar/MANIFEST.MF
+gradle/wrapper/gradle-wrapper.jar
