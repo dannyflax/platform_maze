@@ -15,3 +15,7 @@ dependencies {
     compile ('com.github.dannyflax:JOGL-Utilities:1655b84')
     testCompile 'junit:junit:4.+'
 }
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.0'
+}
