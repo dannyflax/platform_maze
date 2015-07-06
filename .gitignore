@@ -98,4 +98,3 @@ build/libs/platform_maze_github.jar
 build/scripts/platform_maze_github
 build/scripts/platform_maze_github.bat
 build/tmp/jar/MANIFEST.MF
-gradle/wrapper/gradle-wrapper.jar
